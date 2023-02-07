@@ -10,40 +10,42 @@
 
 <body>
     <script>
+        const promise3 = new Promise((resolve, reject) => setTimeout(() => { reject('oops') }, 1000));
         const promise1 = Promise.resolve(3);
         const promise2 = Promise.reject(5);
-        const promise3 = new Promise((resolve, reject) => setTimeout(() => { reject('oops') }, 1000));
 
-        const promises = [promise1, promise2, promise3];
-        Promise.allSettled(promises).then(console.log)
+        // const promises = [promise1, promise2, promise3];
+        // Promise.allSettled(promises).then(x => console.log('first', x))
 
         function getAllSettled(...arrPromises) {
 
             return new Promise(resolve => {
-                arrPromises.forEach(item => {
-                    item
-                        .then(x => {
-                            const resObj = {
-                                status: 'fulfilled',
-                                value: x
-                            }
-                            resolve(resObj);
-                        })
-                        .catch(x => {
-                            const resObj = {
-                                status: 'rejected',
-                                reason: x
-                            }
-                            resolve(resObj);
-                        })
+                const resultArray = [];
 
+                arrPromises.forEach((item, index) => {
+                    item
+                        .then(value => {
+                            resultArray[index] = {
+                                status: 'fulfilled',
+                                value
+                            }
+                        })
+                        .catch(value => {
+                            resultArray[index] = {
+                                status: 'rejected',
+                                reason: value
+                            };
+                        })
+                        .finally(() => {
+                            const condition = resultArray.findIndex(x => x === undefined) === -1 && arrPromises.length === resultArray.length
+
+                            if (condition) resolve(resultArray);
+                        })
                 })
             })
-
-
         }
 
-        getAllSettled(promise1, promise2, promise3).then(console.log)
+        let res = getAllSettled(promise1, promise2, promise3).then(x => console.log('second', x))
 
     </script>
 </body>
