@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        const promise1 = Promise.resolve(3);
+        const promise2 = Promise.reject(5);
+        const promise3 = new Promise((resolve, reject) => setTimeout(() => { reject('oops') }, 1000));
+
+        const promises = [promise1, promise2, promise3];
+        Promise.allSettled(promises).then(console.log)
+
+        function getAllSettled(...arrPromises) {
+
+            return new Promise(resolve => {
+                arrPromises.forEach(item => {
+                    item
+                        .then(x => {
+                            const resObj = {
+                                status: 'fulfilled',
+                                value: x
+                            }
+                            resolve(resObj);
+                        })
+                        .catch(x => {
+                            const resObj = {
+                                status: 'rejected',
+                                reason: x
+                            }
+                            resolve(resObj);
+                        })
+
+                })
+            })
+
+
+        }
+
+        getAllSettled(promise1, promise2, promise3).then(console.log)
+
+    </script>
+</body>
+
+</html>
